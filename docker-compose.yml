@@ -1,0 +1,18 @@
+version: "3"
+services:
+  mailmenot:
+    container_name: mailmenot
+    build:
+      context : ./
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    environment:
+      - NODE_ENV=production
+    expose:
+      - "8000"
+
+networks:
+  default:
+    external:
+      name: nginx-proxy-manager_default
