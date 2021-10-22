@@ -10,7 +10,7 @@ services:
     environment:
       - NODE_ENV=production
     expose:
-      - "8000"
+      - "3000"
 
 networks:
   default:
