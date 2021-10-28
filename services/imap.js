@@ -1,4 +1,5 @@
 const Imap = require('imap');
+const {getInboxMappingByEmailAddress} = require("./database");
 const {sendMessage} = require("./telegram");
 const {getChatIdByMailPrefix} = require("./database");
 const {simpleParser} = require('mailparser');
@@ -25,6 +26,7 @@ imap.once('end', () => {
     console.log('Connection ended');
 });
 
+//TODO: rewrite with promises.
 const listenForMails = () => {
     imap.openBox('INBOX', false, () => {
         imap.on("mail", mail => {
@@ -34,23 +36,26 @@ const listenForMails = () => {
                 f.on('message', msg => {
                     msg.on('body', stream => {
                         simpleParser(stream, async (err, parsed) => {
-                            // const {from, subject, textAsHtml, text} = parsed;
-
-                            /* Make API call to save the data
-                               Save the retrieved data into a database.
-                               E.t.c
-                            */
                             console.log(parsed.to);
                             let user = parsed.to.value[0].address.substr(0, parsed.to.value[0].address.indexOf('_'));
                             if(!user) user = parsed.to.value[0].address.substr(0, parsed.to.value[0].address.indexOf('@'));
                             const userMapping  =  await getChatIdByMailPrefix(user);
+                            const inboxMapping = await getInboxMappingByEmailAddress(parsed.to.text);
                             if(userMapping){
-                                await sendMessage(parsed.text,userMapping.conversationId);
+                                const text = `
+                                From: ${parsed.from.text}
+                                To : ${inboxMapping ? inboxMapping.inboxName : ""} ${parsed.to.text} 
+                                Subject: ${parsed.subject}
+                                Content : ${parsed.text}
+                                `
+
+                                await sendMessage(text,userMapping.conversationId);
                             }
                         });
                     });
                     msg.once('attributes', attrs => {
                         const {uid} = attrs;
+                        //Also marked as seen, as deleted flag doesn't work instant appearantly
                         imap.addFlags(uid, ['Deleted', 'Seen'], () => {
                             // Deleted the email as read after reading it
                             console.log('Marked as Deleted!');
