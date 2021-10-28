@@ -41,15 +41,17 @@ const listenForMails = () => {
                             if(!user) user = parsed.to.value[0].address.substr(0, parsed.to.value[0].address.indexOf('@'));
                             const userMapping  =  await getChatIdByMailPrefix(user);
                             const inboxMapping = await getInboxMappingByEmailAddress(parsed.to.value[0].address);
-                            if(userMapping){
-                                const text = `
+                            if(!inboxMapping || !inboxMapping.isBlocked){
+                                if(userMapping){
+                                    const text = `
                                 From: ${parsed.from.text}
                                 To : ${inboxMapping ? inboxMapping.inboxName : ""} ${parsed.to.text} 
                                 Subject: ${parsed.subject}
                                 Content : ${parsed.text}
                                 `
 
-                                await sendMessage(text,userMapping.conversationId);
+                                    await sendMessage(text,userMapping.conversationId);
+                            }
                             }
                         });
                     });

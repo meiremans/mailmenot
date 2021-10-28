@@ -1,4 +1,5 @@
 var express = require('express');
+const {blockInbox} = require("../services/database");
 const {sendMessage} = require("../services/telegram");
 const {createInboxMapping} = require("../services/database");
 const {findOrCreateUserMapping} = require("../services/database");
@@ -26,11 +27,11 @@ router.post('/hook', async (req, res, next) => {
   }else{
     await sendMessage("I'm just a bot, I can't reply... yet. ",req.body.message.chat.id);
   }
-
-  res.send('respond with a resource');
+  res.send('');
 });
 
 const botCommands = async (telegramUpdate, message, usermapping) => {
+  const conversationId = telegramUpdate.message?.chat?.id;
   const command = message.text.substring(message.entities[0].offset, message.entities[0].length);
   const arguments = message.text.substring(message.entities[0].length).trim().split(" ");
 
@@ -38,15 +39,16 @@ const botCommands = async (telegramUpdate, message, usermapping) => {
   if(command === "/help"){
     return 'Commands: \n' +
         '/help: this one \n' +
-        '/new inboxName inboxSuffix (optional) make a new named inbox \n'
+        '/new inboxName inboxSuffix (optional) make a new named inbox \n' +
+        '/block inboxName (only named inboxes can be blocked)'
   }
 
   //make new named inbox /new inboxName inboxSuffix (optional)
   if (command === "/new") {
     const inboxName = arguments[0];
     const inboxSuffix = arguments[1] ? arguments[1] : arguments[0];
-    await createInboxMapping(telegramUpdate, inboxSuffix, inboxName);
-    return "inbox created"
+    const inbox = await createInboxMapping(telegramUpdate, inboxSuffix, inboxName);
+    return `inbox ${inbox.inboxURI} created, named as ${inbox.inboxName}`
   }
   if(command === "/start"){
     return `welcome ${message.chat.first_name} to mailmenot 
@@ -58,6 +60,14 @@ const botCommands = async (telegramUpdate, message, usermapping) => {
     For questions or remarks, one place:
     https://github.com/meiremans/mailmenot
     `
+  }
+
+  if(command === "/block"){
+    const inboxName = arguments[0];
+    const result = await blockInbox(conversationId, inboxName);
+    if(result){
+      return `inbox ${result.value.inboxName} <${result.value.inboxURI}> is now blocked`
+    }
   }
 
   return "What's that? try /help";

@@ -49,6 +49,10 @@ exports.findOrCreateUserMapping = async (telegramUpdate) => {
     }
 }
 
+exports.blockInbox = async (conversationId, inboxName) =>{
+     return await inboxCollection.findOneAndUpdate({conversationId,inboxName},{$set : {isBlocked : true}},{returnNewDocument : true});
+}
+
 exports.createInboxMapping = async (telegramUpdate,inboxSuffix, inboxName) => {
     try{
         const userMapping = await this.findOrCreateUserMapping(telegramUpdate);
@@ -56,9 +60,11 @@ exports.createInboxMapping = async (telegramUpdate,inboxSuffix, inboxName) => {
         const inbox = {
             conversationId : userMapping.conversationId,
             inboxURI : `${userMapping.mailPrefix}_${inboxSuffix}@${process.env.DOMAIN}`,
-            inboxName
+            inboxName,
+            isBlocked : false
         }
         inboxCollection.insertOne(inbox);
+        return inbox;
     }catch(e){
         console.error(e);
     }
