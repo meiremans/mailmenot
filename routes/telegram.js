@@ -18,6 +18,7 @@ router.post('/hook', async (req, res, next) => {
     const result = await botCommands(req.body,message, usermapping);
     await sendMessage(result,req.body.message.chat.id);
   }
+
   res.send('respond with a resource');
 });
 

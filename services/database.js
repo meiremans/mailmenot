@@ -1,11 +1,22 @@
 const { MongoClient } = require('mongodb');
-console.log("process.env.MONGODB")
-console.log(process.env.MONGODB)
-const uri = process.env.MONGODB;
+let uri;
+if(process.env.NODE_ENV === "production"){
+    console.log(process.env.NODE_ENV);
+    console.log("process.env.MONGODB")
+    console.log(process.env.MONGODB)
+    uri = process.env.MONGODB;
+}else{
+    console.log(process.env.NODE_ENV);
+    console.log("process.env.MONGODB_TEST")
+    console.log(process.env.MONGODB_TEST)
+    uri = process.env.MONGODB_TEST;
+}
+
 
 const ObjectID = MongoClient.ObjectID;
 let db;
 let collection, inboxCollection;
+
 
 exports.init = async () => {
     const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -16,6 +27,9 @@ exports.init = async () => {
     inboxCollection = db.collection('inboxes');
     await inboxCollection.createIndex({ inboxURI: 1 }, { unique: true });
 }
+
+exports.db = db;
+
 
 exports.getNewId = () => new ObjectID();
 

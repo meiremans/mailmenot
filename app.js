@@ -33,6 +33,7 @@ database.init().then(() => {
   app.use('/', indexRouter);
   app.use('/users', usersRouter);
   app.use('/telegram', telegramRouter);
+  app.db = database.db;
 
 // catch 404 and forward to error handler
   app.use(function(req, res, next) {
@@ -49,6 +50,7 @@ database.init().then(() => {
     res.status(err.status || 500);
     res.render('error');
   });
+  app.emit('appStarted');
 }).catch(e => {
   console.error(e);
 });
