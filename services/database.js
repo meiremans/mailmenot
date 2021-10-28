@@ -20,6 +20,8 @@ exports.init = async () => {
 exports.getNewId = () => new ObjectID();
 
 exports.findOrCreateUserMapping = async (telegramUpdate) => {
+    const conversationId = telegramUpdate.message?.chat?.id;
+    if (!conversationId) return; //then it's an edited message, ignore this
     const result = await collection.findOne({conversationId : telegramUpdate.message.chat.id});
     if(!result){
         const user = {

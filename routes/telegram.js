@@ -4,11 +4,15 @@ const {createInboxMapping} = require("../services/database");
 const {findOrCreateUserMapping} = require("../services/database");
 var router = express.Router();
 
-/* GET users listing. */
+router.get('/hook', async (req, res, next) => {
+  res.send('POST to this endpoint');
+});
+
 router.post('/hook', async (req, res, next) => {
   console.log(req.body);
   const message = req.body.message;
   const usermapping = await findOrCreateUserMapping(req.body);
+  if(!usermapping) return   res.send('');
 
   if(message.entities && message.entities[0]?.type ==="bot_command"){
     const result = await botCommands(req.body,message, usermapping);
