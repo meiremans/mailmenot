@@ -51,7 +51,7 @@ exports.getInboxMappingByEmailAddress = async (inboxURI) => {
 }
 
 exports.getChatIdByMailPrefix = async (mailPrefix) => {
-    return await collection.findOne({mailPrefix: mailPrefix.toLowerCase()});
+    return (await collection.find({mailPrefix: mailPrefix.toLowerCase()}))[0];
 }
 
 exports.close = () => {
