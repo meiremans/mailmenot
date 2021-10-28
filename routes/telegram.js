@@ -10,7 +10,13 @@ router.get('/hook', async (req, res, next) => {
 
 router.post('/hook', async (req, res, next) => {
   console.log(req.body);
+  if(req.body.edited_message) {
+    await sendMessage("sneaky sneaky edits are not supported",req.body.edited_message.chat.id);
+    res.send('');
+    return;
+  }
   const message = req.body.message;
+
   const usermapping = await findOrCreateUserMapping(req.body);
   if(!usermapping) return   res.send('');
 
