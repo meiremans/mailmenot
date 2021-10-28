@@ -70,7 +70,9 @@ exports.createInboxMapping = async (telegramUpdate,inboxSuffix, inboxName) => {
     }
 
 }
-
+exports.getAllInboxes = async (conversationId) => {
+    return await inboxCollection.find({conversationId : conversationId}).toArray();
+}
 exports.getInboxMappingByEmailAddress = async (inboxURI) => {
    return await inboxCollection.findOne({inboxURI : inboxURI});
 }

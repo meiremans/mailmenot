@@ -1,4 +1,5 @@
 var express = require('express');
+const {getAllInboxes} = require("../services/database");
 const {blockInbox} = require("../services/database");
 const {sendMessage} = require("../services/telegram");
 const {createInboxMapping} = require("../services/database");
@@ -40,7 +41,8 @@ const botCommands = async (telegramUpdate, message, usermapping) => {
     return 'Commands: \n' +
         '/help: this one \n' +
         '/new inboxName inboxSuffix (optional) make a new named inbox \n' +
-        '/block inboxName (only named inboxes can be blocked)'
+        '/block inboxName (only named inboxes can be blocked) \n' +
+        '/list list named inboxes'
   }
 
   //make new named inbox /new inboxName inboxSuffix (optional)
@@ -67,7 +69,18 @@ const botCommands = async (telegramUpdate, message, usermapping) => {
     const result = await blockInbox(conversationId, inboxName);
     if(result){
       return `inbox ${result.value.inboxName} <${result.value.inboxURI}> is now blocked`
+    }else{
+      return "Nope this inbox doens't exist"
     }
+  }
+
+  if(command === "/list"){
+    const result = await getAllInboxes(conversationId);
+   return result.reduce((acc,inbox) => {
+      return `${acc} Inbox ${inbox.inboxName} <${inbox.inboxURI}> ${inbox.isBlocked ? "BLOCKED" : "ACTIVE"}\n`
+    },'')
+
+
   }
 
   return "What's that? try /help";
