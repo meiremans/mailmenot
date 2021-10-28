@@ -50,22 +50,27 @@ exports.findOrCreateUserMapping = async (telegramUpdate) => {
 }
 
 exports.createInboxMapping = async (telegramUpdate,inboxSuffix, inboxName) => {
-   const userMapping = await this.findOrCreateUserMapping(telegramUpdate);
+    try{
+        const userMapping = await this.findOrCreateUserMapping(telegramUpdate);
 
-   const inbox = {
-       conversationId : userMapping.conversationId,
-       inboxURI : `${userMapping.mailPrefix}_${inboxSuffix}`,
-       inboxName
-   }
-    inboxCollection.insertOne(inbox);
+        const inbox = {
+            conversationId : userMapping.conversationId,
+            inboxURI : `${userMapping.mailPrefix}_${inboxSuffix}@${process.env.DOMAIN}`,
+            inboxName
+        }
+        inboxCollection.insertOne(inbox);
+    }catch(e){
+        console.error(e);
+    }
+
 }
 
 exports.getInboxMappingByEmailAddress = async (inboxURI) => {
-   return await inboxCollection.findOne(inboxURI);
+   return await inboxCollection.findOne({inboxURI : inboxURI});
 }
 
 exports.getChatIdByMailPrefix = async (mailPrefix) => {
-    return (await collection.find({mailPrefix: mailPrefix.toLowerCase()}))[0];
+    return await collection.findOne({mailPrefix: mailPrefix.toLowerCase()});
 }
 
 exports.close = () => {

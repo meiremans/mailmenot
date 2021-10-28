@@ -40,7 +40,7 @@ const listenForMails = () => {
                             let user = parsed.to.value[0].address.substr(0, parsed.to.value[0].address.indexOf('_'));
                             if(!user) user = parsed.to.value[0].address.substr(0, parsed.to.value[0].address.indexOf('@'));
                             const userMapping  =  await getChatIdByMailPrefix(user);
-                            const inboxMapping = await getInboxMappingByEmailAddress(parsed.to.text);
+                            const inboxMapping = await getInboxMappingByEmailAddress(parsed.to.value[0].address);
                             if(userMapping){
                                 const text = `
                                 From: ${parsed.from.text}
