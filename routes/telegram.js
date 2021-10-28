@@ -17,6 +17,8 @@ router.post('/hook', async (req, res, next) => {
   if(message.entities && message.entities[0]?.type ==="bot_command"){
     const result = await botCommands(req.body,message, usermapping);
     await sendMessage(result,req.body.message.chat.id);
+  }else{
+    await sendMessage("I'm just a bot, I can't reply... yet. ",req.body.message.chat.id);
   }
 
   res.send('respond with a resource');
@@ -50,9 +52,9 @@ const botCommands = async (telegramUpdate, message, usermapping) => {
     For questions or remarks, one place:
     https://github.com/meiremans/mailmenot
     `
-
-
   }
+
+  return "What's that? try /help";
 
 }
 

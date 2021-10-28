@@ -1,15 +1,15 @@
 const { MongoClient } = require('mongodb');
 let uri;
-if(process.env.NODE_ENV === "production"){
-    console.log(process.env.NODE_ENV);
-    console.log("process.env.MONGODB")
-    console.log(process.env.MONGODB)
-    uri = process.env.MONGODB;
-}else{
+if(process.env.NODE_ENV === "test"){
     console.log(process.env.NODE_ENV);
     console.log("process.env.MONGODB_TEST")
     console.log(process.env.MONGODB_TEST)
     uri = process.env.MONGODB_TEST;
+}else{
+    console.log(process.env.NODE_ENV);
+    console.log("process.env.MONGODB")
+    console.log(process.env.MONGODB)
+    uri = process.env.MONGODB;
 }
 
 
