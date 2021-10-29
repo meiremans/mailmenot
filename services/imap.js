@@ -57,12 +57,13 @@ const listenForMails = async () => {
                     }
                 }
             });
+            msg.once('attributes', deleteMessage);
         });
-        msg.once('attributes', deleteMessage);
+
     })
 }
 
-const deleteMessage = (attr) => {
+const deleteMessage = (attrs) => {
     const {uid} = attrs;
     //Also marked as seen, as deleted flag doesn't work instant appearantly
     imap.addFlags(uid, ['Deleted', 'Seen'], () => {
