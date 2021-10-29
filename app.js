@@ -16,12 +16,12 @@ const app = express();
 
 database.init()
     .then(db => versionUpdate(db))
-    .then((updateMessage) => {
+    .then(async (updateMessage) => {
   console.log(updateMessage);
       if(updateMessage){
-        const users = database.getAllUsers();
+        const users = await database.getAllUsers();
         const sendMessages = users.map(x => telegram.sendMessage(updateMessage,x.conversationId, "html"));
-        Promise.all(sendMessages);
+        await Promise.all(sendMessages);
       }
   const imap = require('./services/imap'); //on require it will start listening
 
