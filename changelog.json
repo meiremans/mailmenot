@@ -3,5 +3,10 @@
     "title" : "Sossis trol",
     "text" : "Initial development",
     "image" : "https://i.ytimg.com/vi/gv6M8yrH1JU/maxresdefault.jpg"
+  },
+  "0.0.2" : {
+    "title" : "Input Validation",
+    "text" : "Added validation on creation of new inbox",
+    "image" : "https://www.memesmonkey.com/images/memesmonkey/bd/bde19aaa5b97f186eef523588abd3877.jpeg"
   }
 }
