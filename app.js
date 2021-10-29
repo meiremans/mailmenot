@@ -1,6 +1,5 @@
-
-
 const createError = require('http-errors');
+const {getTemplate} = require("./templates/upgradeMessage");
 const express = require('express');
 require('dotenv').config();
 const path = require('path');
@@ -11,14 +10,20 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const telegramRouter = require('./routes/telegram');
 const database = require('./services/database');
+const telegram = require('./services/telegram');
 
 const app = express();
 
-database.init().then(() => {
-
+database.init()
+    .then(db => versionUpdate(db))
+    .then((updateMessage) => {
+  console.log(updateMessage);
+      if(updateMessage){
+        const users = database.getAllUsers();
+        const sendMessages = users.map(x => telegram.sendMessage(updateMessage,x.conversationId));
+        Promise.all(sendMessages);
+      }
   const imap = require('./services/imap'); //on require it will start listening
-
-
 
 // view engine setup
   app.set('views', path.join(__dirname, 'views'));
@@ -34,6 +39,7 @@ database.init().then(() => {
   app.use('/users', usersRouter);
   app.use('/telegram', telegramRouter);
   app.db = database.db;
+
 
 // catch 404 and forward to error handler
   app.use(function(req, res, next) {
@@ -55,5 +61,25 @@ database.init().then(() => {
   console.error(e);
 });
 
+const versionUpdate = async (db) => {
+  const systeminfo = db.collection('systeminfo');
+
+  const version = await systeminfo.findOne({_id : "version"});
+  const newVersion =  require('./package.json').version;
+  if(!version || version.value !== newVersion){
+    console.warn('will upgrade data to latest version');
+    try{
+      systeminfo.insertOne({_id : "version", value : newVersion});
+      const changelog = require('./changelog');
+      return getTemplate(changelog[newVersion]);
+    }catch(e){
+      console.error("upgrade failed",e);
+    }
+
+  }else{
+    console.log(`mailmenot is running V${version.value}`);
+  }
+
+}
 
 module.exports = app;
