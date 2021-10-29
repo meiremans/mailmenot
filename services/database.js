@@ -69,6 +69,7 @@ exports.createInboxMapping = async ({conversationId,name,inboxSuffix, inboxName}
         return inbox;
     }catch(e){
         console.error(e);
+        throw (e);
     }
 
 }

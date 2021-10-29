@@ -29,10 +29,16 @@ const listExecutor = async ({conversationId, args}) => {
 }
 
 const newExecutor = async ({conversationId,name, args}) => {
+    try{
     const inboxName = args[0];
+    if(!inboxName) return "You must specify an inbox name";
     const inboxSuffix = args[1] ? args[1] : args[0];
+
     const inbox = await createInboxMapping({conversationId,name, inboxSuffix, inboxName});
     return `inbox ${inbox.inboxURI} created, named as ${inbox.inboxName}`
+    }catch(e){
+        return `inbox already exists`
+    }
 }
 
 const startExecutor = async ({conversationId,name}) => {
