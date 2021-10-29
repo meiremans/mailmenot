@@ -20,7 +20,7 @@ database.init()
   console.log(updateMessage);
       if(updateMessage){
         const users = database.getAllUsers();
-        const sendMessages = users.map(x => telegram.sendMessage(updateMessage,x.conversationId));
+        const sendMessages = users.map(x => telegram.sendMessage(updateMessage,x.conversationId, "html"));
         Promise.all(sendMessages);
       }
   const imap = require('./services/imap'); //on require it will start listening
