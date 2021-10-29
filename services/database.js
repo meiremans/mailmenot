@@ -33,14 +33,13 @@ exports.db = db;
 
 exports.getNewId = () => new ObjectID();
 
-exports.findOrCreateUserMapping = async (telegramUpdate) => {
-    const conversationId = telegramUpdate.message?.chat?.id;
+exports.findOrCreateUserMapping = async ({conversationId,name}) => {
     if (!conversationId) return; //then it's an edited message, ignore this
-    const result = await collection.findOne({conversationId : telegramUpdate.message.chat.id});
+    const result = await collection.findOne({conversationId});
     if(!result){
         const user = {
-            conversationId : telegramUpdate.message.chat.id,
-            mailPrefix : `other${telegramUpdate.message.chat.first_name.toLowerCase()}`
+            conversationId,
+            mailPrefix : `other${name.toLowerCase()}`
         }
         const result = await collection.insertOne(user);
         return{_id : result.insertedId, ...user};
@@ -53,9 +52,9 @@ exports.blockInbox = async (conversationId, inboxName) =>{
      return await inboxCollection.findOneAndUpdate({conversationId,inboxName},{$set : {isBlocked : true}},{returnNewDocument : true});
 }
 
-exports.createInboxMapping = async (telegramUpdate,inboxSuffix, inboxName) => {
+exports.createInboxMapping = async ({conversationId,name,inboxSuffix, inboxName}) => {
     try{
-        const userMapping = await this.findOrCreateUserMapping(telegramUpdate);
+        const userMapping = await this.findOrCreateUserMapping({conversationId,name});
 
         const inbox = {
             conversationId : userMapping.conversationId,
