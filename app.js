@@ -69,7 +69,7 @@ const versionUpdate = async (db) => {
   if(!version || version.value !== newVersion){
     console.warn('will upgrade data to latest version');
     try{
-      systeminfo.insertOne({_id : "version", value : newVersion});
+      systeminfo.updateOne({_id : "version"},{_id : "version", value : newVersion},{upsert:true});
       const changelog = require('./changelog');
       return getTemplate(changelog[newVersion]);
     }catch(e){
