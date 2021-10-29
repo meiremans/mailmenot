@@ -25,13 +25,16 @@ exports.init = async () => {
     await collection.createIndex({ conversationId: 1 }, { unique: true });
 
     inboxCollection = db.collection('inboxes');
+
     await inboxCollection.createIndex({ inboxURI: 1 }, { unique: true });
+    return db;
 }
 
 exports.db = db;
 
-
 exports.getNewId = () => new ObjectID();
+
+exports.getAllUsers = async () => await collection.find({}).toArray();
 
 exports.findOrCreateUserMapping = async ({conversationId,name}) => {
     if (!conversationId) return; //then it's an edited message, ignore this
@@ -83,3 +86,5 @@ exports.getChatIdByMailPrefix = async (mailPrefix) => {
 exports.close = () => {
     client.close();
 }
+
+
