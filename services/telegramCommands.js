@@ -45,7 +45,7 @@ const startExecutor = async ({conversationId,name}) => {
     const usermapping = await findOrCreateUserMapping({conversationId, name});
     return `welcome ${name} to mailmenot 
     your email prefix is ${usermapping.mailPrefix}
-    you can send emails to ${usermapping.mailPrefix}_WHATEVER@${process.env.domain}
+    you can send emails to ${usermapping.mailPrefix}_WHATEVER@${process.env.DOMAIN}
     you can create a mapping with /new to give inboxes names (this name will be shown in "FROM"
     /help gives you more information
     
